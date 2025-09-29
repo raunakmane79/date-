@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DripLab Date Proposal</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0a0a0c; --ink:#f6f6f7; --muted:#c9c9d3; --line:#1a1a1e;
+    --gold:#d8b673; --cream:#efe8d5; --accent:#ff8bb3;
+    --heart:#ff4d88;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background: radial-gradient(1000px 700px at 80% 0%, #171821 0%, #0f1015 40%, #0a0a0c 100%);
+    color:var(--ink);
+    font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    overflow:hidden;
+    min-height:100vh;
+  }
+
+  .orb{position:fixed;z-index:-2;width:620px;height:620px;border-radius:50%;filter:blur(88px);opacity:.22;animation:floaty 28s ease-in-out infinite}
+  .orb.o1{left:-220px;top:-240px;background:radial-gradient(circle,var(--gold),transparent 60%)}
+  .orb.o2{right:-260px;top:18vh;background:radial-gradient(circle,#a98bff,transparent 60%);animation-duration:34s}
+  .orb.o3{left:42%;bottom:-260px;background:radial-gradient(circle,#ff9ac2,transparent 60%);animation-duration:31s}
+  @keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-28px)}100%{transform:translateY(0)}}
+
+  .heart{
+    position:fixed; left:50%; top:110%;
+    width:16px; height:16px; transform:translateX(-50%) rotate(45deg);
+    background:var(--heart);
+    filter:drop-shadow(0 0 8px rgba(255,77,136,.6));
+    opacity:.75;
+    animation:rise 10s linear infinite;
+    z-index:-1;
+  }
+  .heart:before, .heart:after{
+    content:""; position:absolute; width:16px; height:16px; border-radius:50%;
+    background:var(--heart);
+  }
+  .heart:before{ left:-8px; top:0;}
+  .heart:after { left:0; top:-8px;}
+  @keyframes rise{
+    0%{ transform:translate(-50%,0) rotate(45deg); opacity:.2}
+    90%{ opacity:.9}
+    100%{ transform:translate(-50%,-120vh) rotate(45deg); opacity:0}
+  }
+
+  header{
+    position:sticky; top:0; z-index:10;
+    background:#0b0b0fcc; backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;justify-content:center;align-items:center;padding:12px 6vw}
+  .brand{font-weight:900;font-size:1.05rem;letter-spacing:.06em;color:var(--cream)}
+
+  .wrap{
+    position:relative;
+    width:100%; height:calc(100vh - 60px);
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; overflow:hidden;
+    flex-direction:column;
+  }
+
+  .logoWord{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(14px,1.6vw,18px);
+    letter-spacing:.26em; text-transform:uppercase; color:var(--cream);
+    opacity:.96;
+  }
+  .divider{width:76px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.7;margin:12px auto}
+  .title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(26px,5vw,52px);
+    line-height:1.2;
+    background:linear-gradient(90deg,#ffd3e1,#fff8dc,#ffd3e1);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:shine 5s linear infinite; background-size:200% 100%; letter-spacing:.01em;
+    text-shadow:0 10px 40px rgba(255,141,188,.15);
+    max-width:90vw;
+  }
+  @keyframes shine { 0%{background-position:-200%} 100%{background-position:200%} }
+  .subtitle{color:var(--muted);font-size:clamp(14px,1.4vw,18px);letter-spacing:.05em;margin-top:8px}
+
+  .btnRow {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 40px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta{
+    display:inline-flex; align-items:center; justify-content:center;
+    gap:10px; padding:14px 24px; border-radius:999px;
+    border:1px solid transparent; background:#171824cc;
+    color:var(--cream); font-family:'Cormorant Garamond',serif;
+    font-size:1.2rem; letter-spacing:.08em; cursor:pointer;
+    user-select:none; white-space:nowrap;
+    box-shadow:0 12px 30px rgba(216,182,115,.08);
+    transition:transform .2s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease), background .25s var(--ease);
+  }
+  .cta:hover{ transform:translateY(-2px) scale(1.03); box-shadow:0 16px 42px rgba(216,182,115,.18); }
+  .cta:active{ transform:scale(.97); }
+
+  .cta-yes{
+    border-color:#ffd1e1a6; background:linear-gradient(180deg,#1e1f2a,#14151c);
+  }
+  .cta-no{
+    border-color:#ff9abda6; background:linear-gradient(180deg,#1f1620,#141019);
+    transition: transform 0.8s cubic-bezier(.22,.61,.36,1);
+    will-change: transform;
+    position: relative;
+    z-index: 3;
+  }
+
+  .modal{
+    position:fixed; inset:0; display:none; place-items:center;
+    background:rgba(10,10,12,.55); backdrop-filter:blur(8px);
+    z-index:50;
+  }
+  .modal.open{ display:grid; }
+  .card{
+    width:min(780px,92vw);
+    border:1px solid rgba(216,182,115,.28);
+    border-radius:18px;
+    background:linear-gradient(180deg, rgba(25,26,32,.96), rgba(17,18,24,.98));
+    padding:20px;
+    animation:pop .4s var(--ease);
+    box-shadow:0 20px 60px rgba(0,0,0,.5), 0 20px 50px rgba(216,182,115,.15) inset;
+  }
+  @keyframes pop{ from{ transform:scale(.96); opacity:0 } to{ transform:scale(1); opacity:1 } }
+
+  .card h2{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(26px,4.6vw,40px);
+    background:linear-gradient(90deg,#ffe3ef,#fff6e0,#ffd6ea);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    margin-bottom:8px;
+  }
+  .card p{ color:var(--muted); margin-bottom:14px }
+  .links{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:8px }
+  @media(max-width:700px){ .links{ grid-template-columns:1fr } }
+  .link{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    text-decoration:none; color:#fff; padding:10px 12px; border-radius:12px;
+    border:1px solid rgba(216,182,115,.25);
+    background:linear-gradient(180deg,#1b1c24,#12131a);
+    transition:.25s var(--ease); font-weight:600;
+  }
+  .link small{ color:var(--muted) }
+  .link:hover{ transform:translateY(-3px); box-shadow:0 10px 28px rgba(216,182,115,.24); border-color:rgba(216,182,115,.5) }
+  .closeBtn{
+    margin-top:14px; display:inline-flex; align-items:center; gap:8px;
+    padding:10px 14px; border-radius:999px; border:1px solid var(--gold); background:#121217; color:var(--cream);
+    cursor:pointer;
+  }
+
+  #confetti{ position:fixed; inset:0; pointer-events:none; z-index:60; }
+</style>
+</head>
+<body>
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="heart" style="left:20%; animation-duration:11s;"></div>
+  <div class="heart" style="left:40%; animation-duration:13s; animation-delay:1s;"></div>
+  <div class="heart" style="left:60%; animation-duration:12s; animation-delay:.6s;"></div>
+  <div class="heart" style="left:80%; animation-duration:10s; animation-delay:1.2s;"></div>
+
+  <header>
+    <div class="nav"><div class="brand">Made with ♥ by Raunak </div></div>
+  </header>
+
+  <main class="wrap" id="wrap">
+    <div class="logoWord">A tiny, sparkly question</div>
+    <div class="divider"></div>
+    <h1 class="title">Sooo… would you like to go on a cute little date with me?</h1>
+    <p class="subtitle">I’ll bring the snacks, you bring that gorgeous smile ✨</p>
+
+    <div class="btnRow">
+      <button id="yes" class="cta cta-yes">💖 Yes</button>
+      <button id="no" class="cta cta-no">😢 No</button>
+    </div>
+  </main>
+
+  <canvas id="confetti"></canvas>
+
+  <section id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="card">
+      <h2>Yay! Best. Answer. Ever. 💘</h2>
+      <p>You just made my day (and probably my whole week). Let’s plan cute things together:</p>
+
+      <div class="links">
+        <a class="link" target="_blank" href="https://www.google.com/maps/search/romantic+restaurants+near+me">
+          Dinner & dessert crawl <small>Find romantic spots nearby</small> <span>🍰</span>
+        </a>
+        <a class="link" target="_blank" href="https://www.google.com/maps/search/picnic+spots+near+me">
+          Sunset picnic <small>Pick a pretty park</small> <span>🌅</span>
+        </a>
+        <a class="link" target="_blank" href="https://www.google.com/maps/search/pottery+class+near+me">
+          Pottery class <small>Ghost moment, incoming</small> <span>🌀</span>
+        </a>
+        <a class="link" target="_blank" href="https://www.google.com/maps/search/mini+golf+or+bowling+near+me">
+          Mini-golf or bowling <small>Cute & competitive</small> <span>🎳</span>
+        </a>
+        <a class="link" target="_blank" href="https://open.spotify.com/search/romantic%20acoustic%20playlist">
+          Playlist night <small>Queue cozy songs</small> <span>🎶</span>
+        </a>
+        <a class="link" target="_blank" href="https://www.google.com/maps/search/couples+workshop+near+me">
+          Couple workshop <small>Dance, cooking, art…</small> <span>🫶</span>
+        </a>
+      </div>
+
+      <button class="closeBtn" id="closeModal">Close • more ideas later →</button>
+    </div>
+  </section>
+
+<script>
+/* Confetti for YES */
+(function(){
+  const c = document.getElementById('confetti');
+  const ctx = c.getContext('2d');
+  let W, H, pieces = [], running=false, timer;
+
+  function resize(){ W=c.width=innerWidth; H=c.height=innerHeight; }
+  addEventListener('resize', resize); resize();
+
+  function spawn(n=150){
+    pieces.length=0;
+    for(let i=0;i<n;i++){
+      pieces.push({
+        x: Math.random()*W,
+        y: -20 - Math.random()*H*.5,
+        r: 6+Math.random()*8,
+        c: ['#FF7AA2','#FFD6E8','#FFF1C2','#B7A6FF','#9EE7FF'][Math.floor(Math.random()*5)],
+        v: 1.2+Math.random()*2.2,
+        w: Math.random()*2+1
+      });
+    }
+  }
+
+  function draw(){
+    if(!running) return;
+    ctx.clearRect(0,0,W,H);
+    pieces.forEach(p=>{
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.y/40);
+      ctx.fillStyle=p.c; ctx.beginPath();
+      ctx.moveTo(0,-p.r); ctx.lineTo(p.r,0); ctx.lineTo(0,p.r); ctx.lineTo(-p.r,0);
+      ctx.closePath(); ctx.fill(); ctx.restore();
+      p.y+=p.v; p.x+=Math.sin(p.y/20)*p.w;
+      if(p.y>H+30) p.y=-20,p.x=Math.random()*W;
+    });
+    requestAnimationFrame(draw);
+  }
+
+  function burst(){
+    running=true; spawn(180); draw();
+    clearTimeout(timer);
+    timer=setTimeout(()=>{running=false;ctx.clearRect(0,0,W,H);},4500);
+  }
+  window.__confettiBurst=burst;
+})();
+
+/* Buttons + Sliding "No" logic (on hover) */
+(function(){
+  const btnYes=document.getElementById('yes');
+  const btnNo=document.getElementById('no');
+  const modal=document.getElementById('modal');
+  const closeModal=document.getElementById('closeModal');
+
+  btnYes.addEventListener('click',()=>{
+    modal.classList.add('open');
+    window.__confettiBurst && window.__confettiBurst();
+  });
+  closeModal.addEventListener('click',()=> modal.classList.remove('open'));
+  modal.addEventListener('click',(e)=>{if(e.target===modal) modal.classList.remove('open');});
+
+  let base = null;
+  function ensureBase(){
+    if(base) return;
+    const r = btnNo.getBoundingClientRect();
+    base = { x: r.left + r.width/2, y: r.top + r.height/2 };
+  }
+
+  function randomMove(){
+    ensureBase();
+    const bw = btnNo.offsetWidth, bh = btnNo.offsetHeight;
+    const pad = 30;
+    const maxX = innerWidth  - pad - bw/2;
+    const minX = pad + bw/2;
+    const maxY = innerHeight - pad - bh/2;
+    const minY = pad + bh/2;
+
+    const targetX = Math.random() * (maxX - minX) + minX;
+    const targetY = Math.random() * (maxY - minY) + minY;
+
+    const dx = targetX - base.x;
+    const dy = targetY - base.y;
+
+    btnNo.style.transform = `translate(${dx}px, ${dy}px)`;
+  }
+
+  btnNo.addEventListener('mouseenter',(e)=>{ e.preventDefault(); randomMove(); });
+  btnNo.addEventListener('touchstart',(e)=>{ e.preventDefault(); randomMove(); }, {passive:false});
+})();
+</script>
+</body>
+</html>
