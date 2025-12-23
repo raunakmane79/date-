@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>DripLab Date Proposal</title>
 
-<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
@@ -154,7 +153,7 @@
     text-decoration:none; color:#fff; padding:10px 12px; border-radius:12px;
     border:1px solid rgba(216,182,115,.25);
     background:linear-gradient(180deg,#1b1c24,#12131a);
-    transition:.25s var(--ease); font-weight:600;
+    transition:.25s var(--ease); font-weight:600; cursor:pointer;
   }
   .link small{ color:var(--muted) }
   .link:hover{ transform:translateY(-3px); box-shadow:0 10px 28px rgba(216,182,115,.24); border-color:rgba(216,182,115,.5) }
@@ -162,6 +161,28 @@
     margin-top:14px; display:inline-flex; align-items:center; gap:8px;
     padding:10px 14px; border-radius:999px; border:1px solid var(--gold); background:#121217; color:var(--cream);
     cursor:pointer;
+  }
+
+  /* Stargazing Overlay */
+  #stargaze-overlay {
+    position: fixed; inset: 0; background: #000; z-index: 100;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; color: white; opacity: 0; transition: opacity 2s ease;
+  }
+  #stargaze-overlay.active { display: flex; opacity: 1; }
+  .star-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(24px, 4vw, 42px);
+    margin-top: 20px;
+    background: linear-gradient(180deg, #fff, #d8b673);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    z-index: 102;
+  }
+  .star-bg { position: absolute; inset: 0; z-index: 101; pointer-events: none; }
+  .back-btn {
+      margin-top: 30px; padding: 10px 20px; border-radius: 20px; 
+      border: 1px solid rgba(255,255,255,0.3); background: transparent; color: #aaa;
+      cursor: pointer; z-index: 105; font-size: 0.8rem;
   }
 
   #confetti{ position:fixed; inset:0; pointer-events:none; z-index:60; }
@@ -198,29 +219,35 @@
       <p>You just made my day (and probably my whole week). Let’s plan cute things together:</p>
 
       <div class="links">
-        <a class="link" target="_blank" href="https://www.google.com/maps/search/romantic+restaurants+near+me">
+        <a class="link" target="_blank" href="https://www.google.com/maps/search/romantic+dinner+and+dessert/">
           Dinner & dessert crawl <small>Find romantic spots nearby</small> <span>🍰</span>
         </a>
-        <a class="link" target="_blank" href="https://www.google.com/maps/search/picnic+spots+near+me">
+        <a class="link" target="_blank" href="https://www.google.com/maps/search/parks+with+view/">
           Sunset picnic <small>Pick a pretty park</small> <span>🌅</span>
         </a>
-        <a class="link" target="_blank" href="https://www.google.com/maps/search/pottery+class+near+me">
+        <div class="link" id="stargaze-trigger">
+          Stargazing <small>A magical view for you</small> <span>✨</span>
+        </div>
+        <a class="link" target="_blank" href="https://www.google.com/maps/search/Movie+theatre+near+me">
+          Movie night <small>Let's catch a film</small> <span>🎬</span>
+        </a>
+        <a class="link" target="_blank" href="https://www.google.com/maps/search/pottery+class/">
           Pottery class <small>Ghost moment, incoming</small> <span>🌀</span>
         </a>
-        <a class="link" target="_blank" href="https://www.google.com/maps/search/mini+golf+or+bowling+near+me">
-          Mini-golf or bowling <small>Cute & competitive</small> <span>🎳</span>
-        </a>
-        <a class="link" target="_blank" href="https://open.spotify.com/search/romantic%20acoustic%20playlist">
+        <a class="link" target="_blank" href="https://open.spotify.com/track/1dGr1c8CrMLDpV6mPbImSI?si=22e5f259af22472e">
           Playlist night <small>Queue cozy songs</small> <span>🎶</span>
-        </a>
-        <a class="link" target="_blank" href="https://www.google.com/maps/search/couples+workshop+near+me">
-          Couple workshop <small>Dance, cooking, art…</small> <span>🫶</span>
         </a>
       </div>
 
       <button class="closeBtn" id="closeModal">Close • more ideas later →</button>
     </div>
   </section>
+
+  <div id="stargaze-overlay">
+      <canvas class="star-bg" id="starCanvas"></canvas>
+      <div class="star-text">But why look at the sky?<br>My brightest star is right here. ✨</div>
+      <button class="back-btn" id="star-back">← go back to planning</button>
+  </div>
 
 <script>
 /* Confetti for YES */
@@ -309,6 +336,56 @@
 
   btnNo.addEventListener('mouseenter',(e)=>{ e.preventDefault(); randomMove(); });
   btnNo.addEventListener('touchstart',(e)=>{ e.preventDefault(); randomMove(); }, {passive:false});
+
+  /* STARGAZING LOGIC */
+  const stargazeTrigger = document.getElementById('stargaze-trigger');
+  const starOverlay = document.getElementById('stargaze-overlay');
+  const starBack = document.getElementById('star-back');
+  const starCanvas = document.getElementById('starCanvas');
+  const sCtx = starCanvas.getContext('2d');
+  
+  let stars = [];
+  function createStars() {
+      starCanvas.width = window.innerWidth;
+      starCanvas.height = window.innerHeight;
+      stars = [];
+      for(let i=0; i<200; i++) {
+          stars.push({
+              x: Math.random() * starCanvas.width,
+              y: Math.random() * starCanvas.height,
+              size: Math.random() * 1.5,
+              opacity: Math.random(),
+              speed: 0.01 + Math.random() * 0.02
+          });
+      }
+  }
+
+  function animateStars() {
+      sCtx.clearRect(0,0, starCanvas.width, starCanvas.height);
+      stars.forEach(s => {
+          s.opacity += s.speed;
+          if(s.opacity > 1 || s.opacity < 0) s.speed = -s.speed;
+          sCtx.fillStyle = `rgba(255, 255, 255, ${Math.abs(s.opacity)})`;
+          sCtx.beginPath();
+          sCtx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+          sCtx.fill();
+      });
+      if(starOverlay.classList.contains('active')) requestAnimationFrame(animateStars);
+  }
+
+  stargazeTrigger.addEventListener('click', () => {
+      starOverlay.style.display = 'flex';
+      setTimeout(() => {
+          starOverlay.classList.add('active');
+          createStars();
+          animateStars();
+      }, 10);
+  });
+
+  starBack.addEventListener('click', () => {
+      starOverlay.classList.remove('active');
+      setTimeout(() => { starOverlay.style.display = 'none'; }, 2000);
+  });
 })();
 </script>
 </body>
